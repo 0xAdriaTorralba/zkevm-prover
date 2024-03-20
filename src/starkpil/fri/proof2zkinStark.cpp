@@ -241,7 +241,7 @@ ordered_json joinzkinBlobOuterRecursive2(ordered_json &zkin1, ordered_json &zkin
     }
     zkinOut["b_finalPol"] = zkin2["finalPol"];
 
-    // Add rootC blobOuter to publics
+    // Add rootC blobOuterRecursive2 to publics
     zkinOut["rootC"] = ordered_json::array();
     for (int i = 0; i < 4; i++)
     {

@@ -1170,10 +1170,13 @@ void Prover::genBlobOuterProof (ProverRequest *pProverRequest){
     // ----------------------------------------------
     // JOIN PUBLICS AND GET COMMITED POLS
     // ----------------------------------------------
+    ordered_json blobOuterRecursive2VerkeyJson;
+    file2json(config.blobOuterRecursive2Verkey, blobOuterRecursive2VerkeyJson);
+
+    json zkinInputBlobOuter = joinzkinBlobOuter(pProverRequest->blobOuterProofInputBatch, pProverRequest->blobOuterProofInputBlobInner, blobOuterRecursive2VerkeyJson, pProverRequest->blobOuterProofInputBatch["chain_id"].dump(), starkBlobOuter->starkInfo.starkStruct.steps.size());    
+
     ordered_json blobOuterVerkeyJson;
     file2json(config.blobOuterVerkey, blobOuterVerkeyJson);
-
-    json zkinInputBlobOuter = joinzkinBlobOuter(pProverRequest->blobOuterProofInputBatch, pProverRequest->blobOuterProofInputBlobInner, blobOuterVerkeyJson, pProverRequest->blobOuterProofInputBatch["chain_id"].dump(), starkBlobOuter->starkInfo.starkStruct.steps.size());    
 
     Goldilocks::Element blobOuterVerkey[4];
     blobOuterVerkey[0] = Goldilocks::fromU64(blobOuterVerkeyJson["constRoot"][0]);
@@ -1394,10 +1397,10 @@ void Prover::genAggregatedBatchProof (ProverRequest *pProverRequest)
         publicsJson[i] = zkinInputRecursive2["publics"][i];
     }
     // Add the recursive2 verification key
-    publicsJson[61] = to_string(recursive2VerkeyJson["constRoot"][0]);
-    publicsJson[62] = to_string(recursive2VerkeyJson["constRoot"][1]);
-    publicsJson[63] = to_string(recursive2VerkeyJson["constRoot"][2]);
-    publicsJson[64] = to_string(recursive2VerkeyJson["constRoot"][3]);
+    publicsJson[starkBatch->starkInfo.nPublics] = to_string(recursive2VerkeyJson["constRoot"][0]);
+    publicsJson[starkBatch->starkInfo.nPublics + 1] = to_string(recursive2VerkeyJson["constRoot"][1]);
+    publicsJson[starkBatch->starkInfo.nPublics + 2] = to_string(recursive2VerkeyJson["constRoot"][2]);
+    publicsJson[starkBatch->starkInfo.nPublics + 3] = to_string(recursive2VerkeyJson["constRoot"][3]);
 
     json2file(publicsJson, pProverRequest->publicsOutputFile());
 
@@ -1486,16 +1489,16 @@ void Prover::genAggregatedBlobOuterProof (ProverRequest *pProverRequest){
     // ----------------------------------------------
     // JOIN PUBLICS AND GET COMMITED POLS
     // ----------------------------------------------
-    ordered_json recursive2VerkeyJson;
-    file2json(config.blobOuterRecursive2Verkey, recursive2VerkeyJson);
+    ordered_json blobOuterRecursive2VerkeyJson;
+    file2json(config.blobOuterRecursive2Verkey, blobOuterRecursive2VerkeyJson);
 
-    json zkinInputRecursive2 = joinzkinBlobOuterRecursive2(pProverRequest->aggregatedBlobOuterProofInput1, pProverRequest->aggregatedBlobOuterProofInput2, recursive2VerkeyJson, starkBlobOuterRecursive2->starkInfo.starkStruct.steps.size());
+    json zkinInputRecursive2 = joinzkinBlobOuterRecursive2(pProverRequest->aggregatedBlobOuterProofInput1, pProverRequest->aggregatedBlobOuterProofInput2, blobOuterRecursive2VerkeyJson, starkBlobOuterRecursive2->starkInfo.starkStruct.steps.size());
 
     Goldilocks::Element recursive2Verkey[4];
-    recursive2Verkey[0] = Goldilocks::fromU64(recursive2VerkeyJson["constRoot"][0]);
-    recursive2Verkey[1] = Goldilocks::fromU64(recursive2VerkeyJson["constRoot"][1]);
-    recursive2Verkey[2] = Goldilocks::fromU64(recursive2VerkeyJson["constRoot"][2]);
-    recursive2Verkey[3] = Goldilocks::fromU64(recursive2VerkeyJson["constRoot"][3]);
+    recursive2Verkey[0] = Goldilocks::fromU64(blobOuterRecursive2VerkeyJson["constRoot"][0]);
+    recursive2Verkey[1] = Goldilocks::fromU64(blobOuterRecursive2VerkeyJson["constRoot"][1]);
+    recursive2Verkey[2] = Goldilocks::fromU64(blobOuterRecursive2VerkeyJson["constRoot"][2]);
+    recursive2Verkey[3] = Goldilocks::fromU64(blobOuterRecursive2VerkeyJson["constRoot"][3]);
 
     Goldilocks::Element publics[starkBlobOuterRecursive2->starkInfo.nPublics];
 
@@ -1504,9 +1507,9 @@ void Prover::genAggregatedBlobOuterProof (ProverRequest *pProverRequest){
         publics[i] = Goldilocks::fromString(zkinInputRecursive2["publics"][i]);
     }
 
-    for (uint64_t i = 0; i < recursive2VerkeyJson["constRoot"].size(); i++)
+    for (uint64_t i = 0; i < blobOuterRecursive2VerkeyJson["constRoot"].size(); i++)
     {
-        publics[starkBlobOuter->starkInfo.nPublics + i] = Goldilocks::fromU64(recursive2VerkeyJson["constRoot"][i]);
+        publics[starkBlobOuter->starkInfo.nPublics + i] = Goldilocks::fromU64(blobOuterRecursive2VerkeyJson["constRoot"][i]);
     }
 
     CommitPolsStarks cmPolsRecursive2(pAddress, (1 << starkBlobOuterRecursive2->starkInfo.starkStruct.nBits), starkBlobOuterRecursive2->starkInfo.nCm1);
@@ -1560,10 +1563,10 @@ void Prover::genAggregatedBlobOuterProof (ProverRequest *pProverRequest){
         publicsJson[i] = zkinInputRecursive2["publics"][i];
     }
     // Add the recursive2 verification key
-    publicsJson[60] = to_string(recursive2VerkeyJson["constRoot"][0]);
-    publicsJson[61] = to_string(recursive2VerkeyJson["constRoot"][1]);
-    publicsJson[62] = to_string(recursive2VerkeyJson["constRoot"][2]);
-    publicsJson[63] = to_string(recursive2VerkeyJson["constRoot"][3]);
+    publicsJson[starkBlobOuter->starkInfo.nPublics ] = to_string(blobOuterRecursive2VerkeyJson["constRoot"][0]);
+    publicsJson[starkBlobOuter->starkInfo.nPublics + 1] = to_string(blobOuterRecursive2VerkeyJson["constRoot"][1]);
+    publicsJson[starkBlobOuter->starkInfo.nPublics + 2] = to_string(blobOuterRecursive2VerkeyJson["constRoot"][2]);
+    publicsJson[starkBlobOuter->starkInfo.nPublics + 3] = to_string(blobOuterRecursive2VerkeyJson["constRoot"][3]);
 
     json2file(publicsJson, pProverRequest->publicsOutputFile());
 
