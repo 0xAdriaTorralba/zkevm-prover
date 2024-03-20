@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-VERSION=v5.0.0-rc.4-fork.8
+VERSION=develop_feijoa-fork.9
 FORK_VERSION=$(sed -e 's/.*-fork.//g' <<< ${VERSION})
 FORK_ID=fork_$FORK_VERSION
 
@@ -14,7 +14,7 @@ RECURSIVE1_CPP=./src/starkpil/starkRecursive1/witness/recursive1.cpp
 RECURSIVE2_CPP=./src/starkpil/starkRecursive2/witness/recursive2.cpp
 
 BLOB_INNER_VERIFIER_CPP=./src/starkpil/blob_inner/witness/blob_inner.verifier.cpp
-BLOB_INNER_RECURSIVE1_CPP=./src/starkpil/blob_inner/witness/blob_inner.recursive1.cpp
+BLOB_INNER_RECURSIVE1_CPP=./src/starkpil/blob_inner_recursive1/witness/blob_inner_recursive1.cpp
 BLOB_OUTER_CPP=./src/starkpil/blob_outer/witness/blob_outer.cpp
 BLOB_OUTER_RECURSIVE2_CPP=./src/starkpil/blob_outer_recursive2/witness/blob_outer_recursive2.cpp
 
@@ -27,6 +27,9 @@ rsync -avz --progress ${CONFIG_DIR}/ config/
 rm config/scripts/rom.json
 rm config/scripts/metadata-rom.txt
 
+rm config/scripts/blob-rom.json
+rm config/scripts/metadata-blob-rom.txt
+
 #Uncomment the following line if you want to generate source code the first time after the release files generation
 
 #Copy the chelpers files
@@ -36,10 +39,10 @@ cp ${C_FILES}/recursive1.chelpers/Recursive1Steps.hpp ./src/starkpil/starkRecurs
 cp ${C_FILES}/recursive2.chelpers/Recursive2Steps.hpp ./src/starkpil/starkRecursive2/chelpers/Recursive2Steps.hpp
 
 cp ${C_FILES}/blob_inner.chelpers/BlobInnerSteps.hpp ./src/starkpil/blob_inner/chelpers/BlobInnerSteps.hpp
-cp ${C_FILES}/blob_inner.chelpers/BlobInnerCompressorSteps.hpp ./src/starkpil/blob_inner/chelpers/BlobInnerCompressorSteps.hpp
-cp ${C_FILES}/blob_inner.chelpers/BlobInnerRecursive1Steps.hpp ./src/starkpil/blob_inner/chelpers/BlobInnerRecursive1Steps.hpp
+cp ${C_FILES}/blob_inner_compressor.chelpers/BlobInnerCompressorSteps.hpp ./src/starkpil/blob_inner_compressor/chelpers/BlobInnerCompressorSteps.hpp
+cp ${C_FILES}/blob_inner_recursive1.chelpers/BlobInnerRecursive1Steps.hpp ./src/starkpil/blob_inner_recursive1/chelpers/BlobInnerRecursive1Steps.hpp
 cp ${C_FILES}/blob_outer.chelpers/BlobOuterSteps.hpp ./src/starkpil/blob_outer/chelpers/BlobOuterSteps.hpp
-cp ${C_FILES}/blob_outer.chelpers/BlobOuterRecursive2Steps.hpp ./src/starkpil/blob_outer/chelpers/BlobOuterRecursive2Steps.hpp
+cp ${C_FILES}/blob_outer_recursive2.chelpers/BlobOuterRecursive2Steps.hpp ./src/starkpil/blob_outer_recursive2/chelpers/BlobOuterRecursive2Steps.hpp
 
 cp ${C_FILES}/recursivef.chelpers/RecursiveFSteps.hpp ./src/starkpil/starkRecursiveF/chelpers/RecursiveFSteps.hpp
 
@@ -118,6 +121,10 @@ echo -e "}\n#pragma GCC diagnostic pop" >> ${RECURSIVEFINAL_CPP}
 cp ${CONFIG_DIR}/scripts/rom.json ./src/main_sm/$FORK_ID/scripts/
 cp ${CONFIG_DIR}/scripts/metadata-rom.txt ./src/main_sm/$FORK_ID/scripts/
 cp ${WORKING_DIR}/pil/zkevm/main.pil.json  ./src/main_sm/$FORK_ID/scripts/
+
+cp ${CONFIG_DIR}/scripts/blob-rom.json ./src/main_sm/${FORK_ID}_blob/scripts/rom.json
+cp ${CONFIG_DIR}/scripts/metadata-blob-rom.txt ./src/main_sm/${FORK_ID}_blob/scripts/metadata-rom.txt
+cp ${WORKING_DIR}/pil/blob_inner/main_blob.pil.json  ./src/main_sm/${FORK_ID}_blob/scripts/main.pil.json
 
 #main generator files
 make generate
