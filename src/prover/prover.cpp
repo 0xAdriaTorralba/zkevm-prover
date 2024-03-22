@@ -910,14 +910,14 @@ void Prover::genBlobInnerProof (ProverRequest *pProverRequest){
         publics[16] = cmPols.Main.RR[0];
 
         // oldStateRoot
-        publics[17] = cmPols.Main.SR0[0];
-        publics[18] = cmPols.Main.SR1[0];
-        publics[19] = cmPols.Main.SR2[0];
-        publics[20] = cmPols.Main.SR3[0];
-        publics[21] = cmPols.Main.SR4[0];
-        publics[22] = cmPols.Main.SR5[0];
-        publics[23] = cmPols.Main.SR6[0];
-        publics[24] = cmPols.Main.SR7[0];
+        publics[17] = cmPols.Main.D0[0];
+        publics[18] = cmPols.Main.D1[0];
+        publics[19] = cmPols.Main.D2[0];
+        publics[20] = cmPols.Main.D3[0];
+        publics[21] = cmPols.Main.D4[0];
+        publics[22] = cmPols.Main.D5[0];
+        publics[23] = cmPols.Main.D6[0];
+        publics[24] = cmPols.Main.D7[0];
 
         // forkID
         publics[25] = cmPols.Main.RCX[0];
@@ -1931,43 +1931,57 @@ void Prover::executeBlobInner (ProverRequest *pProverRequest)
     TimerStopAndLog(PROVER_EXECUTE_BLOB_INNER);
 }
 
-void Prover::logBatchExecutionInfo(PROVER_FORK_NAMESPACE::CommitPols& cmPols, ProverRequest *pProverRequest)
+void Prover::logBatchExecutionInfo(PROVER_FORK_NAMESPACE::CommitPols &cmPols, ProverRequest *pProverRequest)
 {
     zkassert(pProverRequest != NULL);
     uint64_t lastN = cmPols.pilDegree() - 1;
-    // log old and new BlobStateRoot
-    // note: we need /*pProverRequest->pFullTracer->get_blob_new_state_root()*/
-    zklog.info("Prover::genBlobInnerProof() called executor.executeBlobInner() oldBlobStateRoot=" + pProverRequest->input.publicInputsExtended.publicInputs.oldBlobStateRoot.get_str(16) +
-        " newBlobStateRoot=" /*+ pProverRequest->pFullTracer->get_blob_new_state_root()*/ +
-        " pols.B[0]=" + fea2string(fr, cmPols.Main.B0[0], cmPols.Main.B1[0], cmPols.Main.B2[0], cmPols.Main.B3[0], cmPols.Main.B4[0], cmPols.Main.B5[0], cmPols.Main.B6[0], cmPols.Main.B7[0]) +
-        " pols.B[lastN]=" + fea2string(fr, cmPols.Main.B0[lastN], cmPols.Main.B1[lastN], cmPols.Main.B2[lastN], cmPols.Main.B3[lastN], cmPols.Main.B4[lastN], cmPols.Main.B5[lastN], cmPols.Main.B6[lastN], cmPols.Main.B7[lastN]) +
-        " lastN=" + to_string(lastN));
+    uint64_t lastN = cmPols.pilDegree() - 1;
 
-    // log old and new BlobAccInputHash
-    // note: we need /*pProverRequest->pFullTracer->get_new_blob_acc_input_hash() */
-    zklog.info("Prover::genBlobInnerProof() called executor.executeBlobInner() oldBlobAccInputHash=" + pProverRequest->input.publicInputsExtended.publicInputs.oldBlobAccInputHash.get_str(16) +
-        " newBlobAccInputHash=" /* + pProverRequest->pFullTracer->get_new_blob_acc_input_hash()*/ +
-        " pols.C[0]=" + fea2string(fr, cmPols.Main.C0[0], cmPols.Main.C1[0], cmPols.Main.C2[0], cmPols.Main.C3[0], cmPols.Main.C4[0], cmPols.Main.C5[0], cmPols.Main.C6[0], cmPols.Main.C7[0]) +
-        " pols.C[lastN]=" + fea2string(fr, cmPols.Main.C0[lastN], cmPols.Main.C1[lastN], cmPols.Main.C2[lastN], cmPols.Main.C3[lastN], cmPols.Main.C4[lastN], cmPols.Main.C5[lastN], cmPols.Main.C6[lastN], cmPols.Main.C7[lastN]) +
-        " lastN=" + to_string(lastN));   
+    // log old and new StateRoot
+    zklog.info("Prover::genBatchProof() called executor.executeBatch() oldStateRoot=" + pProverRequest->input.publicInputsExtended.publicInputs.oldStateRoot.get_str(16) +
+               " newStateRoot=" + pProverRequest->pFullTracer->get_new_state_root() +
+               " pols.SR[0]=" + fea2string(fr, cmPols.Main.SR0[0], cmPols.Main.SR1[0], cmPols.Main.SR2[0], cmPols.Main.SR3[0], cmPols.Main.SR4[0], cmPols.Main.SR5[0], cmPols.Main.SR6[0], cmPols.Main.SR7[0]) +
+               " pols.SR[lastN]=" + fea2string(fr, cmPols.Main.SR0[lastN], cmPols.Main.SR1[lastN], cmPols.Main.SR2[lastN], cmPols.Main.SR3[lastN], cmPols.Main.SR4[lastN], cmPols.Main.SR5[lastN], cmPols.Main.SR6[lastN], cmPols.Main.SR7[lastN]) +
+               " lastN=" + to_string(lastN));
+
+    // log old and new BatchAccInputHash
+    zklog.info("Prover::genBatchProof() called executor.executeBatch() oldBatchAccInputHash=" + pProverRequest->input.publicInputsExtended.publicInputs.oldAccInputHash.get_str(16) +
+               " newAccInputHash=" + pProverRequest->pFullTracer->get_new_acc_input_hash() +
+               " pols.C[0]=" + fea2string(fr, cmPols.Main.C0[0], cmPols.Main.C1[0], cmPols.Main.C2[0], cmPols.Main.C3[0], cmPols.Main.C4[0], cmPols.Main.C5[0], cmPols.Main.C6[0], cmPols.Main.C7[0]) +
+               " pols.C[lastN]=" + fea2string(fr, cmPols.Main.C0[lastN], cmPols.Main.C1[lastN], cmPols.Main.C2[lastN], cmPols.Main.C3[lastN], cmPols.Main.C4[lastN], cmPols.Main.C5[lastN], cmPols.Main.C6[lastN], cmPols.Main.C7[lastN]) +
+               " lastN=" + to_string(lastN));
+
+    // log previous and current L1InfoTreeRoot
+    // note: missed function get_current_l1_info_tree_root()
+    zklog.info("Prover::genBatchProof() called executor.executeBatch() previousL1InfoTreeRoot=" + pProverRequest->input.publicInputsExtended.publicInputs.previousL1InfoTreeRoot.get_str(16) +
+               " currentL1InfoTreeRoot=" /*pProverRequest->pFullTracer->get_current_l1_info_tree_root()*/ +
+               " pols.D[0]=" + fea2string(fr, cmPols.Main.D0[0], cmPols.Main.D1[0], cmPols.Main.D2[0], cmPols.Main.D3[0], cmPols.Main.D4[0], cmPols.Main.D5[0], cmPols.Main.D6[0], cmPols.Main.D7[0]) +
+               " pols.D[lastN]=" + fea2string(fr, cmPols.Main.D0[lastN], cmPols.Main.D1[lastN], cmPols.Main.D2[lastN], cmPols.Main.D3[lastN], cmPols.Main.D4[lastN], cmPols.Main.D5[lastN], cmPols.Main.D6[lastN], cmPols.Main.D7[lastN]) +
+               " lastN=" + to_string(lastN));
+    // log previous and current L1InfoTreeIndex
+    // note: missing function get_current_l1_info_tree_index()
+    zklog.info("Prover::genBatchProof() called executor.executeBatch() previousL1InfoTreeIndex=" + to_string(pProverRequest->input.publicInputsExtended.publicInputs.previousL1InfoTreeIndex) +
+               " currentL1InfoTreeIndex=" /*+ to_string(pProverRequest->pFullTracer->get_current_l1_info_tree_index()*/ +
+               " pols.RCX[0]=" + Goldilocks::toString(cmPols.Main.RCX[0]) +
+               " pols.RCX[lastN]=" + Goldilocks::toString(cmPols.Main.RCX[lastN]));
 }
 
-void Prover::logBlobInnerExecutionInfo(PROVER_FORK_NAMESPACE::CommitPols& cmPols, ProverRequest *pProverRequest)
+void Prover::logBlobInnerExecutionInfo(PROVER_BLOB_FORK_NAMESPACE::CommitPols &cmPols, ProverRequest *pProverRequest)
 {
     uint64_t lastN = cmPols.pilDegree() - 1;
     // log old and new BlobStateRoot
     // note: we need /*pProverRequest->pFullTracer->get_blob_new_state_root()*/
     zklog.info("Prover::genBlobInnerProof() called executor.executeBlobInner() oldBlobStateRoot=" + pProverRequest->input.publicInputsExtended.publicInputs.oldBlobStateRoot.get_str(16) +
-        " newBlobStateRoot=" /*+ pProverRequest->pFullTracer->get_blob_new_state_root()*/ +
-        " pols.B[0]=" + fea2string(fr, cmPols.Main.B0[0], cmPols.Main.B1[0], cmPols.Main.B2[0], cmPols.Main.B3[0], cmPols.Main.B4[0], cmPols.Main.B5[0], cmPols.Main.B6[0], cmPols.Main.B7[0]) +
-        " pols.B[lastN]=" + fea2string(fr, cmPols.Main.B0[lastN], cmPols.Main.B1[lastN], cmPols.Main.B2[lastN], cmPols.Main.B3[lastN], cmPols.Main.B4[lastN], cmPols.Main.B5[lastN], cmPols.Main.B6[lastN], cmPols.Main.B7[lastN]) +
-        " lastN=" + to_string(lastN));
+               " newBlobStateRoot=" /*+ pProverRequest->pFullTracer->get_blob_new_state_root()*/ +
+               " pols.B[0]=" + fea2string(fr, cmPols.Main.B0[0], cmPols.Main.B1[0], cmPols.Main.B2[0], cmPols.Main.B3[0], cmPols.Main.B4[0], cmPols.Main.B5[0], cmPols.Main.B6[0], cmPols.Main.B7[0]) +
+               " pols.B[lastN]=" + fea2string(fr, cmPols.Main.B0[lastN], cmPols.Main.B1[lastN], cmPols.Main.B2[lastN], cmPols.Main.B3[lastN], cmPols.Main.B4[lastN], cmPols.Main.B5[lastN], cmPols.Main.B6[lastN], cmPols.Main.B7[lastN]) +
+               " lastN=" + to_string(lastN));
 
     // log old and new BlobAccInputHash
     // note: we need /*pProverRequest->pFullTracer->get_new_blob_acc_input_hash() */
     zklog.info("Prover::genBlobInnerProof() called executor.executeBlobInner() oldBlobAccInputHash=" + pProverRequest->input.publicInputsExtended.publicInputs.oldBlobAccInputHash.get_str(16) +
-        " newBlobAccInputHash=" /* + pProverRequest->pFullTracer->get_new_blob_acc_input_hash()*/ +
-        " pols.C[0]=" + fea2string(fr, cmPols.Main.C0[0], cmPols.Main.C1[0], cmPols.Main.C2[0], cmPols.Main.C3[0], cmPols.Main.C4[0], cmPols.Main.C5[0], cmPols.Main.C6[0], cmPols.Main.C7[0]) +
-        " pols.C[lastN]=" + fea2string(fr, cmPols.Main.C0[lastN], cmPols.Main.C1[lastN], cmPols.Main.C2[lastN], cmPols.Main.C3[lastN], cmPols.Main.C4[lastN], cmPols.Main.C5[lastN], cmPols.Main.C6[lastN], cmPols.Main.C7[lastN]) +
-        " lastN=" + to_string(lastN));
+               " newBlobAccInputHash=" /* + pProverRequest->pFullTracer->get_new_blob_acc_input_hash()*/ +
+               " pols.C[0]=" + fea2string(fr, cmPols.Main.C0[0], cmPols.Main.C1[0], cmPols.Main.C2[0], cmPols.Main.C3[0], cmPols.Main.C4[0], cmPols.Main.C5[0], cmPols.Main.C6[0], cmPols.Main.C7[0]) +
+               " pols.C[lastN]=" + fea2string(fr, cmPols.Main.C0[lastN], cmPols.Main.C1[lastN], cmPols.Main.C2[lastN], cmPols.Main.C3[lastN], cmPols.Main.C4[lastN], cmPols.Main.C5[lastN], cmPols.Main.C6[lastN], cmPols.Main.C7[lastN]) +
+               " lastN=" + to_string(lastN));
 }
