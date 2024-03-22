@@ -1935,7 +1935,6 @@ void Prover::logBatchExecutionInfo(PROVER_FORK_NAMESPACE::CommitPols &cmPols, Pr
 {
     zkassert(pProverRequest != NULL);
     uint64_t lastN = cmPols.pilDegree() - 1;
-    uint64_t lastN = cmPols.pilDegree() - 1;
 
     // log old and new StateRoot
     zklog.info("Prover::genBatchProof() called executor.executeBatch() oldStateRoot=" + pProverRequest->input.publicInputsExtended.publicInputs.oldStateRoot.get_str(16) +
